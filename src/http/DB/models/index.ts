@@ -1,13 +1,16 @@
 import {ModelCtor} from "sequelize-typescript/dist/model/model/model";
 import {readdirSync} from "fs";
 
-import {getLogger} from "../../helpers/logger";
-import {getFileName} from "../../utils/filePathTools";
+import {getLogger} from "../../../helpers/logger";
+import {getFileName} from "../../../helpers/utils/filePathTools";
+import {Activity} from "./Activity";
+import {Task} from "./Task";
 
 const logger = getLogger("MODELS - INDEX");
 
 export const models: tModelCheck[] = [
-
+   {name: "Task", model: Task},
+   {name: "Activity", model: Activity},
 ];
 
 type tModelCheck = {

@@ -3,7 +3,7 @@ import {Column, DataType, Model, Table} from "sequelize-typescript";
 
 
 @Table
-export class Example extends Model<Example, exampleAttributes> {
+export class Task extends Model<Task, taskAttributes> {
    @Column({type: DataType.STRING})
    declare name: string;
 
@@ -12,7 +12,7 @@ export class Example extends Model<Example, exampleAttributes> {
 }
 
 
-interface exampleAttributes {
+interface taskAttributes {
    name: string,
    other: string,
 }

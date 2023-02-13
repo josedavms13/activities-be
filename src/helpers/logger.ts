@@ -1,5 +1,4 @@
-import log4js from "log4js";
-import {Logger as LoggerType} from "log4js";
+import log4js, {Logger as LoggerType} from "log4js";
 
 class Logger {
    private logger: LoggerType;
@@ -18,31 +17,33 @@ class Logger {
       this.logger = log4js.getLogger(category);
    }
 
-   public log(message: string | any) {
-      console.log(message);
-      if (typeof message === "string") {
-         this.logger.debug(message);
-      } else {
-         this.logger.debug(JSON.stringify(message));
+   public log(message: string | any, args?: any) {
+      this.logger.debug(message);
+      if (args) {
+         this.log(args);
       }
    }
 
-   public error(message: string | any) {
-      console.error(message);
+   public error(message: string | any, args?: any) {
       this.logger.error(message);
+      if (args) {
+         this.error(args);
+      }
    }
 
    public trace(message: any) {
-      console.log(message);
       this.logger.trace(message);
    }
 
    public success(message: string) {
-      console.log(`\t ======== ${ message.toUpperCase() } ========`);
-      this.logger.info(`\t ======== ${ message.toUpperCase() } ========`);
+      // eslint-disable-next-line max-len
+      this.logger.info(`\t \t \t =============== ${ message.toUpperCase() } ===============`);
+   }
+
+   public warn(message: string) {
+      this.logger.warn(message);
    }
 }
-
 
 export function getLogger(category: string): Logger {
    return new Logger(category);
