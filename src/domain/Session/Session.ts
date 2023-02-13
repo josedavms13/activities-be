@@ -3,16 +3,18 @@ import {Activity} from "../../http/DB/models/Activity";
 import {Server} from "socket.io";
 import {DefaultEventsMap} from "socket.io/dist/typed-events";
 import {getLogger} from "../../helpers/logger";
+import {Timer} from "./timer/Timer";
 
 const logger = getLogger("Session");
 
 export class Session {
    private readonly ioServer: tIOServer;
-   private activity: Activity;
-   private hours: number;
-   private minutes: number;
+   private activity: Activity | undefined;
+   private readonly hours: number = 0;
+   private readonly minutes: number = 59;
+   private userId: string | undefined;
    private seconds: number = 59;
-   private pauses: number;
+   private readonly pauses: number | undefined;
    private io: Server<
       DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any
    > | undefined;
@@ -21,24 +23,37 @@ export class Session {
       this.ioServer = ioServer;
       this.activity = activity;
       this.hours = activity.hours;
-      this.minutes = activity.minutes - 1;
+      this.minutes = activity.minutes;
       this.pauses = activity.allowedPauses;
    }
 
    public start() {
-      // TODO: Fix cors in production
+      let timer: Timer;
       this.io = new Server(this.ioServer, {cors: {origin: "*"}});
-
-      this.io.on("connection", (socket) => {
-         logger.log(`New connection, ${ socket.id }`);
+      logger.log("Starting webSocket server");
+      // // ---------- SOCKET INITIALIZATION ---------- ////
+      this.io.on("connect", (socket) => {
+         this.userId = socket.id;
+         socket.emit("connectionCheck", {message: "User connected"});
+         logger.log(`New connection, ${ this.userId }`);
+         timer = new Timer(this.hours, this.minutes!, this.seconds, () => {
+            let i = 0;
+            console.log("Emitting time" + i++);
+            socket.emit("timer", {timer: timer.timer});
+         });
+         timer.start();
       });
-      this.io.on("timePause", (socket) => {
-         this.pause();
-         socket.emit("time paused");
-      });
+      console.log("wait");
    }
 
    private pause() {
       logger.log("Time pause");
+      if (this.pauses) {
+
+      }
+   }
+
+   private sessionFailed() {
+      this.activity?.sayThings();
    }
 }

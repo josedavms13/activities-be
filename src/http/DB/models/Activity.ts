@@ -31,12 +31,22 @@ export class Activity extends Model<Activity, IActivityAttributes> {
 
    @Column({
       type: DataType.INTEGER,
+      defaultValue: 0,
+   })
+   declare failsCount: number;
+
+   @Column({
+      type: DataType.INTEGER,
       allowNull: false,
    })
    declare allowedPauses: number;
 
    @HasMany(() => Task, {foreignKey: "id"})
    declare tasks: Task[];
+
+   public sayThings() {
+      console.log(this.name);
+   }
 }
 
 export interface IActivityAttributes {

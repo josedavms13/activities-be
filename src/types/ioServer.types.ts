@@ -1,3 +1,3 @@
-import {ioServer} from "../index";
+import {httpServer} from "../index";
 
-export type tIOServer = typeof ioServer;
+export type tIOServer = typeof httpServer;
