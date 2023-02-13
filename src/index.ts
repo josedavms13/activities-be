@@ -9,6 +9,7 @@ import {doDBConnection} from "./http/DB/config";
 const logger = getLogger("APP == INDEX");
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 app.use(routes);
 export const ioServer = http.createServer(app);
 

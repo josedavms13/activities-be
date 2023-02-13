@@ -3,7 +3,7 @@ import {Activity, IActivityAttributes} from "../../../DB/models/Activity";
 import {getLogger} from "../../../../helpers/logger";
 import {Response} from "express";
 
-const logger = getLogger("Activities | Operations | Gets");
+const logger = getLogger("Activities | Operations | Post");
 
 export async function createActivity(
    attributes: IActivityAttributes, res?: Response,

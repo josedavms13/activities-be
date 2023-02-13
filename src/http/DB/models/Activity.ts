@@ -31,17 +31,11 @@ export class Activity extends Model<Activity, IActivityAttributes> {
 
    @Column({
       type: DataType.INTEGER,
-      references: {model: Task, key: "id"},
-   })
-   declare taskId: number;
-
-   @Column({
-      type: DataType.INTEGER,
       allowNull: false,
    })
    declare allowedPauses: number;
 
-   @HasMany(() => Task, {foreignKey: "taskId"})
+   @HasMany(() => Task, {foreignKey: "id"})
    declare tasks: Task[];
 }
 
