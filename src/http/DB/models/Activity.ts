@@ -41,12 +41,14 @@ export class Activity extends Model<Activity, IActivityAttributes> {
    })
    declare allowedPauses: number;
 
+   @Column({
+      type: DataType.INTEGER,
+      allowNull: true,
+   })
+   declare missingSeconds: number;
+
    @HasMany(() => Task, {foreignKey: "id"})
    declare tasks: Task[];
-
-   public sayThings() {
-      console.log(this.name);
-   }
 }
 
 export interface IActivityAttributes {

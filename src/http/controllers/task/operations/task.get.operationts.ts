@@ -7,15 +7,11 @@ import {Task} from "../../../DB/models/Task";
 
 const logger = getLogger("Activities | Operations | Gets");
 
-export async function getAllActivities(res?: Response)
+export async function getAllTask(res?: Response)
    : Promise<tDBOperationOutput<Activity[]>> {
    logger.log("Getting all activities");
    try {
-      const activities = await Activity.findAll({
-         include: [{
-            model: Task,
-         }],
-      });
+      const activities = await Task.findAll();
       res?.status(200).json(activities);
       return {
          resStatus: 200,
@@ -34,13 +30,11 @@ export async function getAllActivities(res?: Response)
    }
 }
 
-export async function getActivityById(id: number, res?: Response)
+export async function getTaskById(id: number, res?: Response)
    : Promise<tDBOperationOutput<Activity>> {
    logger.log("Getting activity by id " + id);
    try {
-      const activity = await Activity.findByPk(id, {
-         include: [{model: Task}],
-      });
+      const activity = await Task.findByPk(id);
       res?.status(200).json(activity);
       return {
          resStatus: 200,
@@ -55,40 +49,6 @@ export async function getActivityById(id: number, res?: Response)
          dbData: err,
          success: false,
          message: "Error occurred while getting activity by id",
-      };
-   }
-}
-
-export async function existActivityById(id: number, res?: Response)
-   : Promise<tDBOperationOutput<boolean>> {
-   logger.log("Checking if activity exists by id " + id);
-   try {
-      const activity = await Activity.findOne({
-         where: {id: id},
-      });
-      if (activity) {
-         res?.status(200).json(true);
-         return {
-            resStatus: 200,
-            dbData: true,
-            success: true,
-         };
-      } else {
-         res?.status(200).json(false);
-         return {
-            resStatus: 200,
-            dbData: false,
-            success: true,
-         };
-      }
-   } catch (err) {
-      logger.error(err);
-      res?.status(500).json(err);
-      return {
-         resStatus: 500,
-         dbData: err,
-         success: false,
-         message: "Error occurred while checking if activity exists by id",
       };
    }
 }

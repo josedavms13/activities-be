@@ -38,7 +38,8 @@ export class Session {
          socket.join(this.roomName);
          logger.log(`New connection, ${ socket.id }`);
          socket.emit("connectionCheck",
-            {message: "User connected ",
+            {
+               message: "User connected ",
                user: socket.id,
             });
          if (!this.timer) {
@@ -54,26 +55,28 @@ export class Session {
          socket.on("startTimer", () => this.start());
          socket.on("pauseTimer", () => this.pause());
          socket.on("resumeTimer", () => this.resume());
+         socket.on("stopTimer", () => this.stop());
       });
       return this.isSessionStarted;
    }
 
    private start() {
-      console.log("Starting session");
+      logger.log("Starting session");
       this.timer?.start();
    }
 
    private pause() {
-      console.log("Pausing");
+      logger.log("Pausing");
       this.timer?.pause();
+   }
+
+   private stop() {
+      logger.log("Stopping");
+      this.timer?.stop();
    }
 
    private resume() {
       console.log("Resuming");
       this.timer?.resume();
-   }
-
-   private sessionFailed() {
-      this.activity?.sayThings();
    }
 }
