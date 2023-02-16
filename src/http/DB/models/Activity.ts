@@ -1,6 +1,5 @@
 /* eslint-disable new-cap */
-import {Column, DataType, HasMany, Model, Table} from "sequelize-typescript";
-import {Task} from "./Task";
+import {Column, DataType, Model, Table} from "sequelize-typescript";
 
 
 @Table
@@ -47,8 +46,11 @@ export class Activity extends Model<Activity, IActivityAttributes> {
    })
    declare missingSeconds: number;
 
-   @HasMany(() => Task, {foreignKey: "id"})
-   declare tasks: Task[];
+   @Column({
+      type: DataType.BOOLEAN,
+      defaultValue: false,
+   })
+   declare hasOpenSession: boolean;
 }
 
 export interface IActivityAttributes {

@@ -1,6 +1,5 @@
 /* eslint-disable new-cap */
-import {BelongsTo, Column, DataType, Model, Table} from "sequelize-typescript";
-import {Activity} from "./Activity";
+import {Column, DataType, Model, Table} from "sequelize-typescript";
 
 
 @Table
@@ -17,11 +16,11 @@ export class Task extends Model<Task, ITaskAttributes> {
    @Column({type: DataType.BOOLEAN, defaultValue: false})
    declare completed: boolean;
 
-   @Column({type: DataType.INTEGER, allowNull: false})
+   @Column({
+      type: DataType.INTEGER,
+      allowNull: false,
+   })
    declare activityId: number;
-
-   @BelongsTo(()=>Activity, {foreignKey: "activityId"})
-   declare activity: Activity;
 }
 
 

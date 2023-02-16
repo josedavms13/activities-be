@@ -4,11 +4,13 @@ import {Server} from "socket.io";
 import {DefaultEventsMap} from "socket.io/dist/typed-events";
 import {getLogger} from "../../helpers/logger";
 import {Timer} from "./timer/Timer";
+// eslint-disable-next-line max-len
 
 const logger = getLogger("Session");
 
 export class Session {
-   private isSessionStarted: boolean = false;
+   private isSessionOpen: boolean = false;
+   private _isSessionStarted: boolean = false;
    private readonly ioServer: tIOServer;
    private activity: Activity | undefined;
    private readonly hours: number = 0;
@@ -16,7 +18,7 @@ export class Session {
    private seconds: number = 59;
    private readonly pauses: number | undefined;
 
-   private io: Server<
+   private readonly io: Server<
       DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any
    > | undefined;
    private timer: Timer | null | undefined;
@@ -37,29 +39,44 @@ export class Session {
       this.io!.on("connect", (socket) => {
          socket.join(this.roomName);
          logger.log(`New connection, ${ socket.id }`);
+         this.setUpTimer();
          socket.emit("connectionCheck",
             {
                message: "User connected ",
                user: socket.id,
             });
-         if (!this.timer) {
-            this.timer = new Timer(
-               this.hours, this.minutes!, this.seconds, () => {
-                  this.io!.to(this.roomName)
-                     .emit("timer", {timer: this.timer!.timer});
-               });
-            logger.log("Timer is ready");
-         } else {
-            logger.log("Time was already set");
-         }
          socket.on("startTimer", () => this.start());
          socket.on("pauseTimer", () => this.pause());
          socket.on("resumeTimer", () => this.resume());
          socket.on("stopTimer", () => this.stop());
+         this._isSessionStarted = socket.connected;
       });
-      return this.isSessionStarted;
+      return this.io !== null && this.io !== undefined;
    }
 
+   private setUpTimer() {
+      if (!this.timer) {
+         logger.log("setting up timer");
+         this.timer = new Timer(
+            this.hours,
+            this.minutes!,
+            this.seconds,
+            () => {
+               this.io!.to(this.roomName)
+                  .emit("timer", {timer: this.timer!.timer});
+            },
+            () => {
+               this.io!.to(this.roomName)
+                  .emit("activityFinished");
+               this.complete();
+            },
+         );
+         this.isSessionOpen = true;
+         logger.log("Timer is ready");
+      } else {
+         logger.log("Timer was already set");
+      }
+   }
    private start() {
       logger.log("Starting session");
       this.timer?.start();
@@ -75,8 +92,16 @@ export class Session {
       this.timer?.stop();
    }
 
+   private complete() {
+      logger.log("Completing");
+   }
+
    private resume() {
       console.log("Resuming");
       this.timer?.resume();
+   }
+
+   get isSessionStarted(): boolean {
+      return this._isSessionStarted;
    }
 }

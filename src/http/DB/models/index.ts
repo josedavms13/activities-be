@@ -9,8 +9,8 @@ import {Task} from "./Task";
 const logger = getLogger("MODELS - INDEX");
 
 export const models: tModelCheck[] = [
-   {name: "Activity", model: Activity},
    {name: "Task", model: Task},
+   {name: "Activity", model: Activity},
 ];
 
 type tModelCheck = {

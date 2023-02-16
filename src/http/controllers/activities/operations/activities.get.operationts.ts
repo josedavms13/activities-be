@@ -2,7 +2,6 @@ import {getLogger} from "../../../../helpers/logger";
 import {Response} from "express";
 import {tDBOperationOutput} from "../../controllers.types";
 import {Activity} from "../../../DB/models/Activity";
-import {Task} from "../../../DB/models/Task";
 
 
 const logger = getLogger("Activities | Operations | Gets");
@@ -12,9 +11,6 @@ export async function getAllActivities(res?: Response)
    logger.log("Getting all activities");
    try {
       const activities = await Activity.findAll({
-         include: [{
-            model: Task,
-         }],
       });
       res?.status(200).json(activities);
       return {
@@ -39,14 +35,26 @@ export async function getActivityById(id: number, res?: Response)
    logger.log("Getting activity by id " + id);
    try {
       const activity = await Activity.findByPk(id, {
-         include: [{model: Task}],
       });
-      res?.status(200).json(activity);
-      return {
-         resStatus: 200,
-         dbData: activity,
-         success: true,
-      };
+      if (activity) {
+         res?.status(200).json(activity);
+         return {
+            resStatus: 200,
+            dbData: activity,
+            success: true,
+         };
+      } else {
+         logger.error(`Activity with id ${ id } does not exist`);
+         res?.status(404).json({
+            message: `Activity with id ${ id } does not exist`,
+         });
+         return {
+            resStatus: 404,
+            dbData: null,
+            success: false,
+            message: `Activity with id ${ id } does not exist`,
+         };
+      }
    } catch (err) {
       logger.error(err);
       res?.status(500).json(err);
