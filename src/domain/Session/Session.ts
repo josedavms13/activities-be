@@ -5,6 +5,8 @@ import {DefaultEventsMap} from "socket.io/dist/typed-events";
 import {getLogger} from "../../helpers/logger";
 import {Timer} from "./timer/Timer";
 // eslint-disable-next-line max-len
+import {closeActivity, stopActivity} from "../../http/controllers/activities/operations/activities.put.operations";
+import {closeSession} from "../../http/controllers/sesion/sesion.controller";
 
 const logger = getLogger("Session");
 
@@ -16,10 +18,10 @@ export class Session {
    private readonly hours: number = 0;
    private readonly minutes: number = 59;
    private seconds: number = 59;
-   private readonly pauses: number | undefined;
+   private pauses: number | undefined;
 
    private readonly io: Server<
-      DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any
+      DefaultEventsMap, DefaultEventsMap
    > | undefined;
    private timer: Timer | null | undefined;
    private readonly roomName: string;
@@ -48,7 +50,7 @@ export class Session {
          socket.on("startTimer", () => this.start());
          socket.on("pauseTimer", () => this.pause());
          socket.on("resumeTimer", () => this.resume());
-         socket.on("stopTimer", () => this.stop());
+         socket.on("stopActivity", () => this.stopActivity());
          this._isSessionStarted = socket.connected;
       });
       return this.io !== null && this.io !== undefined;
@@ -77,28 +79,58 @@ export class Session {
          logger.log("Timer was already set");
       }
    }
+
    private start() {
       logger.log("Starting session");
       this.timer?.start();
    }
 
    private pause() {
-      logger.log("Pausing");
-      this.timer?.pause();
+      if (this.pauses! > 0) {
+         logger.log("Pausing");
+         this.io?.to(this.roomName)
+            .emit("pauseTimerConfirmation", {remainingPauses: this.pauses!--});
+         this.timer?.pause();
+      } else {
+         logger.log("No pauses left");
+         this.io?.to(this.roomName)
+            .emit("noPausesLeft");
+      }
    }
 
-   private stop() {
+   private stopActivity() {
       logger.log("Stopping");
+      stopActivity(this.activity!.id, this.timer!.remainingSeconds)
+         .then((data) => {
+            logger.log("Activity stopped");
+            logger.log(`Stop status: ${ data.success }`);
+            closeSession();
+         });
       this.timer?.stop();
+      this.closeServer();
    }
 
    private complete() {
+      closeActivity(this.activity!.id, true)
+         .then((data) => {
+            logger.log("Activity stopped");
+            logger.log(data.success);
+            closeSession();
+         });
+      this.timer?.stop();
       logger.log("Completing");
+      this.closeServer();
    }
 
    private resume() {
       console.log("Resuming");
       this.timer?.resume();
+   }
+
+   private closeServer() {
+      logger.log("Closing server");
+      this.io?.to(this.roomName).emit("closeConnection");
+      this.io?.removeAllListeners();
    }
 
    get isSessionStarted(): boolean {

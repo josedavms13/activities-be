@@ -6,32 +6,6 @@ import {Response} from "express";
 
 const logger = getLogger("Activities | Operations| Puts");
 
-export async function stopActivity(
-   id: number,
-   pendingSeconds: number)
-   : Promise<tDBOperationOutput<Activity>> {
-   logger.log("Stopping activity " + id);
-   const activity = await Activity.findOne({
-      where: {id},
-   });
-   activity!.missingSeconds = pendingSeconds;
-   const updatedActivity = await activity!.save();
-   if (updatedActivity) {
-      logger.success("Activity " + id + " stopped");
-      return {
-         success: true,
-         resStatus: 200,
-         dbData: updatedActivity,
-      };
-   } else {
-      logger.error("Activity " + id + " not found");
-      return {
-         success: false,
-         resStatus: 404,
-         message: "Activity " + id + " not found",
-      };
-   }
-}
 
 export async function markActivityAsStarted(id: number, res?: Response)
    : Promise<tDBOperationOutput<Activity>> {
@@ -70,7 +44,35 @@ export async function markActivityAsStarted(id: number, res?: Response)
       };
    }
 }
-
+export async function stopActivity(
+   id: number,
+   pendingSeconds: number)
+   : Promise<tDBOperationOutput<Activity>> {
+   logger.log("Stopping activity " + id);
+   const updatedActivity = await Activity.update({
+      hasOpenSession: false,
+      missingSeconds: pendingSeconds,
+   }, {
+      where: {
+         id: id,
+      },
+   });
+   if (updatedActivity) {
+      logger.success("Activity " + id + " stopped");
+      return {
+         success: true,
+         resStatus: 200,
+         dbData: updatedActivity,
+      };
+   } else {
+      logger.error("Activity " + id + " not found");
+      return {
+         success: false,
+         resStatus: 404,
+         message: "Activity " + id + " not found",
+      };
+   }
+}
 export async function closeActivity(
    id: number,
    isCompleted: boolean,

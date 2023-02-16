@@ -6,7 +6,7 @@ import {createActivity} from "./operations/acitivities.post.operations";
 import {getLogger} from "../../../helpers/logger";
 import {
    getActivityById,
-   getAllActivities,
+   getAllActivities, getOpenActivities,
 } from "./operations/activities.get.operationts";
 import Joi from "joi";
 
@@ -40,6 +40,17 @@ export async function getAllActivityControl(req: any, res: Response) {
       res.status(400).json({
          message: "Bad Request",
          errors: valid,
+      });
+   }
+}
+
+export async function getOpenActivitiesControl(req: any, res: Response) {
+   try {
+      await getOpenActivities(res);
+   } catch (err) {
+      logger.error(err);
+      res.status(500).json({
+         message: "Internal Server Error",
       });
    }
 }

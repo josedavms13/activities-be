@@ -10,8 +10,7 @@ export async function getAllActivities(res?: Response)
    : Promise<tDBOperationOutput<Activity[]>> {
    logger.log("Getting all activities");
    try {
-      const activities = await Activity.findAll({
-      });
+      const activities = await Activity.findAll({});
       res?.status(200).json(activities);
       return {
          resStatus: 200,
@@ -34,8 +33,7 @@ export async function getActivityById(id: number, res?: Response)
    : Promise<tDBOperationOutput<Activity>> {
    logger.log("Getting activity by id " + id);
    try {
-      const activity = await Activity.findByPk(id, {
-      });
+      const activity = await Activity.findByPk(id, {});
       if (activity) {
          res?.status(200).json(activity);
          return {
@@ -97,6 +95,31 @@ export async function existActivityById(id: number, res?: Response)
          dbData: err,
          success: false,
          message: "Error occurred while checking if activity exists by id",
+      };
+   }
+}
+
+export async function getOpenActivities(res?: Response)
+   : Promise<tDBOperationOutput<Activity[]>> {
+   logger.log("Getting open activities");
+   try {
+      const activities = await Activity.findAll({
+         where: {hasOpenSession: true},
+      });
+      res?.status(200).json(activities);
+      return {
+         resStatus: 200,
+         dbData: activities,
+         success: true,
+      };
+   } catch (err) {
+      logger.error(err);
+      res?.status(500).json(err);
+      return {
+         resStatus: 500,
+         dbData: err,
+         success: false,
+         message: "Error occurred while getting open activities",
       };
    }
 }
