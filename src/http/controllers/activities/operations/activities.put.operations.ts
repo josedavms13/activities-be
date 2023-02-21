@@ -44,7 +44,7 @@ export async function markActivityAsStarted(id: number, res?: Response)
       };
    }
 }
-export async function stopActivity(
+export async function stopActivityDB(
    id: number,
    pendingSeconds: number)
    : Promise<tDBOperationOutput<Activity>> {
@@ -73,7 +73,7 @@ export async function stopActivity(
       };
    }
 }
-export async function closeActivity(
+export async function closeActivityDB(
    id: number,
    isCompleted: boolean,
    res?: Response): Promise<tDBOperationOutput<Activity>> {

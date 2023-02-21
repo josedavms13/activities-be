@@ -5,7 +5,7 @@ import {DefaultEventsMap} from "socket.io/dist/typed-events";
 import {getLogger} from "../../helpers/logger";
 import {Timer} from "./timer/Timer";
 // eslint-disable-next-line max-len
-import {closeActivity, stopActivity} from "../../http/controllers/activities/operations/activities.put.operations";
+import {closeActivityDB, stopActivityDB} from "../../http/controllers/activities/operations/activities.put.operations";
 import {closeSession} from "../../http/controllers/sesion/sesion.controller";
 
 const logger = getLogger("Session");
@@ -69,7 +69,7 @@ export class Session {
             },
             () => {
                this.io!.to(this.roomName)
-                  .emit("activityFinished");
+                  .emit("activityCompleted");
                this.complete();
             },
          );
@@ -100,7 +100,7 @@ export class Session {
 
    private stopActivity() {
       logger.log("Stopping");
-      stopActivity(this.activity!.id, this.timer!.remainingSeconds)
+      stopActivityDB(this.activity!.id, this.timer!.remainingSeconds)
          .then((data) => {
             logger.log("Activity stopped");
             logger.log(`Stop status: ${ data.success }`);
@@ -111,7 +111,7 @@ export class Session {
    }
 
    private complete() {
-      closeActivity(this.activity!.id, true)
+      closeActivityDB(this.activity!.id, true)
          .then((data) => {
             logger.log("Activity stopped");
             logger.log(data.success);

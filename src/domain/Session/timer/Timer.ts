@@ -70,7 +70,7 @@ export class Timer {
    }
 
    private minutePassed(): void {
-      if (this._minutes - 1 > 0) {
+      if (this._minutes - 1 >= 0) {
          this._minutes -= 1;
       } else {
          this._minutes = 59;
