@@ -1,3 +1,5 @@
+import {getSeconds} from "../../utils/timeConverters";
+
 export class Timer {
    private _hour: number;
    private _minutes: number;
@@ -8,12 +10,20 @@ export class Timer {
    private _started: boolean = false;
    private readonly _secondCallback: (() => void) | undefined;
 
+   private readonly _timeOutCallback: (() => void) | undefined;
+
    constructor(
-      hour: number, minutes: number, seconds: number, callback?: () => void) {
-      this._hour = hour > 0 ? hour - 1 : 0;
-      this._minutes = minutes > 0 ? minutes - 1 : 59;
-      this._seconds = seconds > 0 ? seconds - 1 : 59;
+      hour: number,
+      minutes: number,
+      seconds: number,
+      callback?: () => void,
+      timeOutCallback?: () => void,
+   ) {
+      this._hour = hour;
+      this._minutes = minutes;
+      this._seconds = seconds;
       this._secondCallback = callback;
+      this._timeOutCallback = timeOutCallback;
    }
 
    public start() {
@@ -42,6 +52,10 @@ export class Timer {
    }
 
    private secondPassed(): void {
+      if (this.isTimout()) {
+         this.executeTimeoutActions();
+         return;
+      }
       if (this._seconds - 1 >= 0) {
          this._seconds -= 1;
       } else {
@@ -52,7 +66,7 @@ export class Timer {
    }
 
    private minutePassed(): void {
-      if (this._minutes - 1 > 0) {
+      if (this._minutes - 1 >= 0) {
          this._minutes -= 1;
       } else {
          this._minutes = 59;
@@ -61,11 +75,22 @@ export class Timer {
    }
 
    private hourPassed(): void {
-      if (this._hour - 1 > 0) {
+      if (this._hour - 1 >= 0) {
          this._hour -= 1;
       } else {
          this.stop();
       }
+   }
+
+   private isTimout(): boolean {
+      return this._minutes === 0 &&
+         this._seconds === 0 &&
+         this._hour === 0;
+   }
+
+   private executeTimeoutActions(): void {
+      if (this._secondCallback) this._secondCallback();
+      this._isStopped = true;
    }
 
    get isStopped(): boolean {
@@ -82,5 +107,9 @@ export class Timer {
 
    get timer(): string {
       return `${ this._hour }:${ this._minutes }:${ this._seconds }`;
+   }
+
+   get remainingSeconds(): number {
+      return getSeconds(this._hour, this._minutes, this._seconds);
    }
 }

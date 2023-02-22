@@ -12,3 +12,18 @@ export function activityValidation(data: any)
    });
    return activitySchema.validate(data);
 }
+
+export function updateActivityDurationValidation(data: any)
+   : ValidationResult<IActivityUpdateAttributes> {
+   const activitySchema = Joi.object({
+      id: Joi.number().required(),
+      hours: Joi.number().required(),
+      minutes: Joi.number().required(),
+   });
+   return activitySchema.validate(data);
+}
+export interface IActivityUpdateAttributes {
+   id: number,
+   hours: number,
+   minutes: number,
+}

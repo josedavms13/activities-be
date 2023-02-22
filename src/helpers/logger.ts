@@ -37,7 +37,7 @@ class Logger {
 
    public success(message: string) {
       // eslint-disable-next-line max-len
-      this.logger.info(`\t \t \t =============== ${ message.toUpperCase() } ===============`);
+      this.logger.info(`\n \t \t \t =============== ${ message.toUpperCase() } ===============`);
    }
 
    public warn(message: string) {

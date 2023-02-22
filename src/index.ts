@@ -17,7 +17,6 @@ export const httpServer = http.createServer(app);
 
 const port = Number(process.env.PORT);
 const isReset = process.argv[2] === "--reset";
-console.log(isReset);
 
 (async function() {
    if (isReset && getEnvironment() === Environments.development) {
