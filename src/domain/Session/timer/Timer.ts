@@ -89,7 +89,7 @@ export class Timer {
    }
 
    private executeTimeoutActions(): void {
-      if (this._secondCallback) this._secondCallback();
+      if (this._timeOutCallback) this._timeOutCallback();
       this._isStopped = true;
    }
 
