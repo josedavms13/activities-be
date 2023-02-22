@@ -44,6 +44,7 @@ export async function markActivityAsStarted(id: number, res?: Response)
       };
    }
 }
+
 export async function stopActivityDB(
    id: number,
    pendingSeconds: number)
@@ -73,6 +74,7 @@ export async function stopActivityDB(
       };
    }
 }
+
 export async function closeActivityDB(
    id: number,
    isCompleted: boolean,
@@ -110,6 +112,38 @@ export async function closeActivityDB(
          resStatus: 500,
          dbData: e,
          message: "Error while closing activity",
+      };
+   }
+}
+
+export async function modifyActivityDuration(
+   id: number, hours: number, minutes: number, res?: Response)
+   : Promise<tDBOperationOutput<Activity>> {
+   logger.log("Modifying activity " + id);
+   try {
+      const updatedActivity = await Activity.update({
+         hours,
+         minutes,
+      }, {
+         where: {
+            id,
+         },
+         returning: true,
+      });
+      logger.success("Activity " + id + " modified");
+      res?.status(200).json(updatedActivity);
+      return {
+         success: true,
+         resStatus: 200,
+         dbData: updatedActivity,
+      };
+   } catch (e) {
+      logger.error("Activity " + id + " not found", e);
+      res?.status(404).json(e);
+      return {
+         success: false,
+         resStatus: 404,
+         message: "Activity " + id + " not found",
       };
    }
 }

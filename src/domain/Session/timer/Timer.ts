@@ -19,9 +19,9 @@ export class Timer {
       callback?: () => void,
       timeOutCallback?: () => void,
    ) {
-      this._hour = hour > 0 ? hour - 1 : 0;
-      this._minutes = minutes > 0 ? minutes - 1 : 59;
-      this._seconds = seconds > 0 ? seconds - 1 : 59;
+      this._hour = hour;
+      this._minutes = minutes;
+      this._seconds = seconds;
       this._secondCallback = callback;
       this._timeOutCallback = timeOutCallback;
    }
@@ -52,12 +52,8 @@ export class Timer {
    }
 
    private secondPassed(): void {
-      if (
-         this.isTimout() &&
-         this._timeOutCallback !== undefined
-      ) {
-         this._timeOutCallback();
-         this._isStopped = true;
+      if (this.isTimout()) {
+         this.executeTimeoutActions();
          return;
       }
       if (this._seconds - 1 >= 0) {
@@ -79,7 +75,7 @@ export class Timer {
    }
 
    private hourPassed(): void {
-      if (this._hour - 1 > 0) {
+      if (this._hour - 1 >= 0) {
          this._hour -= 1;
       } else {
          this.stop();
@@ -90,6 +86,11 @@ export class Timer {
       return this._minutes === 0 &&
          this._seconds === 0 &&
          this._hour === 0;
+   }
+
+   private executeTimeoutActions(): void {
+      if (this._secondCallback) this._secondCallback();
+      this._isStopped = true;
    }
 
    get isStopped(): boolean {

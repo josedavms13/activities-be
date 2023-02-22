@@ -16,8 +16,8 @@ export class Session {
    private readonly ioServer: tIOServer;
    private activity: Activity | undefined;
    private readonly hours: number = 0;
-   private readonly minutes: number = 59;
-   private seconds: number = 59;
+   private readonly minutes: number;
+   private seconds: number = 0;
    private pauses: number | undefined;
 
    private readonly io: Server<
