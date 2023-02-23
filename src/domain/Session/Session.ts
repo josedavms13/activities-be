@@ -17,6 +17,7 @@ const logger = getLogger("Session");
 export class Session {
    private isSessionOpen: boolean = false;
    private _isSessionStarted: boolean = false;
+   private _isSessionPaused: boolean = true;
    private readonly ioServer: tIOServer;
    private activity: Activity | undefined;
    private hours: number = 0;
@@ -84,25 +85,35 @@ export class Session {
 
    private start() {
       logger.log("Starting session");
+      this._isSessionPaused = false;
       this.timer?.start();
    }
 
    private pause() {
-      if (this.pauses! > 0) {
-         logger.log("Pausing");
-         this.io?.to(this.roomName)
-            .emit("pauseTimerConfirmation", {remainingPauses: this.pauses!--});
-         this.timer?.pause();
+      if (!this._isSessionPaused) {
+         if (this.pauses! > 0) {
+            logger.log("Pausing");
+            this.io?.to(this.roomName)
+               .emit("pauseTimerConfirmation",
+                  {remainingPauses: this.pauses!--});
+            this.timer?.pause();
+            this._isSessionPaused = true;
+         } else {
+            logger.log("No pauses left");
+            this.io?.to(this.roomName)
+               .emit("noPausesLeft");
+         }
       } else {
-         logger.log("No pauses left");
          this.io?.to(this.roomName)
-            .emit("noPausesLeft");
+            .emit("sessionStillPaused");
       }
    }
 
    private stopActivity() {
       logger.log("Stopping");
-      stopActivityDB(this.activity!.id, this.timer!.remainingSeconds)
+      stopActivityDB(this.activity!.id,
+         this.timer!.remainingSeconds,
+         this.pauses!)
          .then((data) => {
             logger.log("Activity stopped");
             logger.log(`Stop status: ${ data.success }`);
@@ -126,6 +137,7 @@ export class Session {
 
    private resume() {
       console.log("Resuming");
+      this._isSessionPaused = false;
       this.timer?.resume();
    }
 

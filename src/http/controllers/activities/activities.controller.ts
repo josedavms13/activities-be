@@ -1,6 +1,7 @@
 import {IReq} from "../controllers.types";
 import {IActivityAttributes} from "../../DB/models/Activity";
 import {Response} from "express";
+// eslint-disable-next-line max-len
 import {activityValidation, updateActivityDurationValidation} from "./requestValidation";
 import {createActivity} from "./operations/acitivities.post.operations";
 import {getLogger} from "../../../helpers/logger";

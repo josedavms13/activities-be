@@ -47,11 +47,13 @@ export async function markActivityAsStarted(id: number, res?: Response)
 
 export async function stopActivityDB(
    id: number,
-   pendingSeconds: number)
+   pendingSeconds: number,
+   remainingPauses: number)
    : Promise<tDBOperationOutput<Activity>> {
    logger.log("Stopping activity " + id);
    const updatedActivity = await Activity.update({
       hasOpenSession: true,
+      remainingPauses,
       missingSeconds: pendingSeconds,
    }, {
       where: {
@@ -90,6 +92,7 @@ export async function closeActivityDB(
          activity.failsCount = !isCompleted ? activity.failsCount + 1 : 0;
          activity.hasOpenSession = false;
          activity.missingSeconds = 0;
+         activity.remainingPauses = activity.allowedPauses;
          const updatedActivity = await activity.save();
          logger.success("Activity " + id + " closed");
          return {

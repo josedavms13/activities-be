@@ -44,6 +44,12 @@ export class Activity extends Model<Activity, IActivityAttributes> {
       type: DataType.INTEGER,
       allowNull: true,
    })
+   declare remainingPauses: number | null;
+
+   @Column({
+      type: DataType.INTEGER,
+      allowNull: true,
+   })
    declare missingSeconds: number;
 
    @Column({
