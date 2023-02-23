@@ -51,7 +51,7 @@ export async function stopActivityDB(
    : Promise<tDBOperationOutput<Activity>> {
    logger.log("Stopping activity " + id);
    const updatedActivity = await Activity.update({
-      hasOpenSession: false,
+      hasOpenSession: true,
       missingSeconds: pendingSeconds,
    }, {
       where: {

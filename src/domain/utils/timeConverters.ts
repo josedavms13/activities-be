@@ -8,6 +8,12 @@ export function getSeconds(
    return (h * 3600) + (m * 60) + s;
 }
 
+/**
+ * Translates the given seconds to hours, minutes and seconds
+ * @template hms [number, number, number]
+ * @param {number} seconds
+ * @return {hms} [hours, minutes, seconds]
+ */
 export function getTimeFromSeconds(seconds: number): [number, number, number] {
    const h = Math.floor(seconds / 3600);
    const m = Math.floor((seconds % 3600) / 60);
