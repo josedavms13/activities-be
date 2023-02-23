@@ -31,8 +31,9 @@ export async function loadActivity(req: any, res: any) {
             session = new Session(httpServer, activity.dbData);
          }
          sessionJoined = session.join();
-         if (sessionJoined) res.status(200).json(`Activity ${ id } loaded`);
-         else {
+         if (sessionJoined) {
+            res.status(200).json(`Activity ${ id } loaded`);
+         } else {
             res.status(404).json({
                error:
                   "Error at loading activity, Server instance failed to load",
@@ -63,6 +64,14 @@ export async function startActivity(req: any, res: any) {
    } else {
       res.status(200).json("There is an open session");
    }
+}
+
+export async function isActiveSession(req: any, res: any) {
+   logger.log("Is active session");
+   res.status(200).json({
+      isActiveSession: session !== null,
+      activity,
+   });
 }
 
 export function closeSession() {
