@@ -28,7 +28,7 @@ export class Session {
    private readonly io: Server<
       DefaultEventsMap, DefaultEventsMap
    > | undefined;
-   private timer: Timer | null | undefined;
+   private timer: Timer | null = null;
    private readonly roomName: string;
 
    constructor(ioServer: tIOServer, activity: Activity) {
@@ -60,7 +60,7 @@ export class Session {
    }
 
    private setUpTimer() {
-      if (!this.timer) {
+      if (this.timer === null) {
          logger.log("setting up timer");
          this.timer = new Timer(
             this.hours,
